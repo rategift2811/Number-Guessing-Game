@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Number Guessing Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        box-sizing: border-box;
+      }
+
+      body {
+        height: 100vh;
+        background-color: red;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      marquee {
+        font-size: 16px;
+        background-color: black;
+        color: white;
+        position: absolute;
+        top: 0;
+        height: 25px;
+        align-content: center;
+        font-family: monospace;
+      }
+
+      .name {
+        color: #ffd700;
+      }
+
+      #piller-1 {
+        height: calc(100vh - 50px);
+        width: 40px;
+        background-color: black;
+        position: absolute;
+        left: 0;
+      }
+
+      #piller-2 {
+        height: calc(100vh - 50px);
+        width: 40px;
+        background-color: black;
+        position: absolute;
+        right: 0;
+      }
+
+      #field {
+        height: 300px;
+        width: 600px;
+        min-width: 600px;
+        max-width: 600px;
+        background-color: #ffd700;
+        border: 5px solid black;
+        border-radius: 25px;
+      }
+      #welcome-h1 {
+        font-size: 32px;
+        margin-top: 10px;
+        color: black;
+      }
+
+      #welcome-p {
+        font-size: 14px;
+        margin-top: 3px;
+        word-spacing: 5px;
+        color: red;
+      }
+
+      #inputField {
+        margin-top: 20px;
+        height: 36px;
+        width: 300px;
+        font-size: 18px;
+        border: 3px solid black;
+        border-radius: 5px;
+        outline: none;
+      }
+
+      #submit {
+        height: 25px;
+        width: 70px;
+        margin-top: 10px;
+        color: white;
+        border: none;
+        background-color: black;
+        border-radius: 4px;
+        font-family: Verdana, Tahoma, sans-serif;
+      }
+
+      #submit:hover {
+        cursor: pointer;
+        color: white;
+        background-color: blue;
+      }
+
+      #remainingGuesses {
+        color: black;
+        margin-top: 10px;
+        padding-right: 30%;
+      }
+
+      #winOrLose {
+        margin-top: 15px;
+        color: black;
+        visibility: hidden;
+      }
+
+      #startNew {
+        height: 27px;
+        width: 100px;
+        margin-top: 15px;
+        margin-right: 5px;
+        background-color: black;
+        color: white;
+        border: 2px solid black;
+        border-radius: 5px;
+      }
+
+      #endGame {
+        height: 27px;
+        width: 100px;
+        margin-top: 15px;
+        margin-left: 5px;
+        background-color: black;
+        color: white;
+        border: 2px solid black;
+        border-radius: 5px;
+      }
+
+      #startNew:hover {
+        cursor: pointer;
+        background-color: green;
+      }
+
+      #endGame:hover {
+        cursor: pointer;
+        background-color: red;
+      }
+
+      .disabled {
+        background-color: #ccc;
+        color: #666;
+        cursor: not-allowed;
+        border: 2px solid #ccc;
+        opacity: 0.6;
+      }
+
+      button:disabled {
+        pointer-events: none;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      #footer-credit {
+        height: 25px;
+        color: white;
+        width: 100vw;
+        background-color: black;
+        position: absolute;
+        bottom: 0;
+        word-spacing: 3px;
+      }
+
+      #footer-credit a {
+        text-decoration: none;
+        color: #ffd700;
+      }
+    </style>
+  </head>
+  <body>
+    <marquee behavior="" direction="">
+      Welcome to <span class="name">Number Guessing Game</span>. Try Guessing a
+      Number from 1 to 100. This game is developed by
+      <span class="name">M. Aoun Khawaja</span> and is the exclusive property of
+      him. Unauthorized use, reproduction, or distribution of this source code
+      is strictly prohibited. Copyright © 2025
+      <span class="name">Number Guessing Game (by M. Aoun Khawaja)</span>. All
+      Rights Reserved.
+    </marquee>
+
+    <div id="piller-1"></div>
+    <div id="piller-2"></div>
+
+    <section id="field">
+      <h1 id="welcome-h1">Welcome to Number Guessing Game</h1>
+      <p id="welcome-p">Try Guessing a Number from 1 to 100</p>
+
+      <form>
+        <input type="text" id="inputField" autofocus />
+        <br />
+        <input type="submit" id="submit" value="Enter" />
+      </form>
+
+      <p id="remainingGuesses">Remaing Guesses: <span id="rGuesses"></span></p>
+      <h2 id="winOrLose">.</h2>
+
+      <button id="startNew">New Game</button>
+      <button id="endGame">End Game</button>
+    </section>
+
+    <p id="footer-credit">Made with ❤️ by <a href="#">M. Aoun Khawaja</a></p>
+    <script>
+      let randomNumber = parseInt(Math.random() * 100 + 1);
+
+      let numGuesses = 0;
+      const totalGuesses = 10;
+
+      const submit = document.querySelector("#submit");
+      const userInput = document.querySelector("#inputField");
+      const rGuesses = document.querySelector("#rGuesses");
+      const winOrLose = document.querySelector("#winOrLose");
+      const endGameButton = document.querySelector("#endGame");
+      const startNewButton = document.querySelector("#startNew");
+
+      submit.addEventListener("click", function (e) {
+        e.preventDefault();
+        const guess = parseInt(userInput.value);
+        validateGuess(guess);
+        userInput.value = "";
+      });
+
+      function validateGuess(guess) {
+        if (isNaN(guess)) {
+          alert("Please enter a valid number");
+        } else if (guess < 1) {
+          alert("Please enter a number greater than 1");
+        } else if (guess > 100) {
+          alert("Please enter a number less than 100");
+        } else {
+          if (numGuesses >= totalGuesses) {
+            winOrLose.innerHTML = `You lost, the random number was: ${randomNumber}`;
+            winOrLose.style.visibility = "visible";
+            winOrLose.style.backgroundColor = "red";
+            endGame();
+          } else {
+            checkGuess(guess);
+            numGuesses++;
+            rGuesses.innerHTML = `${totalGuesses - numGuesses}`;
+            if (numGuesses >= totalGuesses) {
+              winOrLose.innerHTML = `You lost, the random number was: ${randomNumber}`;
+              winOrLose.style.visibility = "visible";
+              winOrLose.style.backgroundColor = "red";
+              endGame();
+            }
+          }
+        }
+      }
+
+      function checkGuess(guess) {
+        if (guess === randomNumber) {
+          winOrLose.innerHTML = `You guessed it right!`;
+          winOrLose.style.visibility = "visible";
+          winOrLose.style.backgroundColor = "green";
+          endGame();
+        }
+      }
+
+      function endGame() {
+        userInput.setAttribute("disabled", "");
+        submit.setAttribute("disabled", "");
+        endGameButton.setAttribute("disabled", "");
+        submit.classList.add("disabled");
+        endGameButton.classList.add("disabled");
+        winOrLose.style.visibility = "visible";
+      }
+
+      function newGame() {
+        randomNumber = parseInt(Math.random() * 100 + 1);
+        numGuesses = 0;
+        rGuesses.innerHTML = `${totalGuesses}`;
+        winOrLose.style.visibility = "hidden";
+        winOrLose.style.backgroundColor = "";
+        winOrLose.innerHTML = ".";
+        userInput.removeAttribute("disabled");
+        submit.removeAttribute("disabled");
+        endGameButton.removeAttribute("disabled");
+        endGameButton.classList.remove("disabled");
+        userInput.focus();
+      }
+
+      startNewButton.addEventListener("click", function (e) {
+        newGame();
+      });
+
+      endGameButton.addEventListener("click", function (e) {
+        winOrLose.innerHTML = `Game Over! The random number was: ${randomNumber}`;
+        winOrLose.style.visibility = "visible";
+        winOrLose.style.backgroundColor = "red";
+        endGame();
+      });
+    </script>
+  </body>
+</html>
